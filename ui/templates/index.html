@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Federated Healthcare System</title>
+    <style>
+        body {
+            font-family: Arial;
+            background: #eef2f7;
+        }
+
+        .container {
+            width: 420px;
+            margin: 50px auto;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px rgba(0,0,0,0.1);
+        }
+
+        input, button {
+            width: 100%;
+            padding: 8px;
+            margin: 6px 0;
+        }
+
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #0056b3;
+        }
+
+        h2 {
+            text-align: center;
+        }
+
+        .logout {
+            text-align: right;
+            margin-bottom: 10px;
+        }
+
+        .logout a {
+            text-decoration: none;
+            color: #dc3545;
+            font-weight: bold;
+        }
+
+        .result {
+            margin-top: 15px;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 5px;
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body>
+<div class="container">
+
+    <div class="logout">
+        <a href="/logout">Logout</a>
+    </div>
+
+    <h2>Diabetes Prediction</h2>
+
+    <form method="POST">
+        <input name="pregnancies" placeholder="Pregnancies" required>
+        <input name="glucose" placeholder="Glucose" required>
+        <input name="bloodpressure" placeholder="Blood Pressure" required>
+        <input name="skinthickness" placeholder="Skin Thickness" required>
+        <input name="insulin" placeholder="Insulin" required>
+        <input name="bmi" placeholder="BMI" required>
+        <input name="dpf" placeholder="Diabetes Pedigree Function" required>
+        <input name="age" placeholder="Age" required>
+        <button type="submit">Predict</button>
+    </form>
+
+    {% if prediction %}
+    <div class="result">
+        <h3>Result: {{ prediction }}</h3>
+
+        {% if score is not none %}
+        <p><strong>Prediction Probability:</strong>
+            {{ "%.2f"|format(score * 100) }}%
+        </p>
+        {% endif %}
+    </div>
+    {% endif %}
+
+</div>
+</body>
+</html>

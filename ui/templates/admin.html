@@ -1,0 +1,14 @@
+<h2>Admin Dashboard</h2>
+<table border="1">
+<tr>
+<th>Doctor</th><th>Prediction</th><th>Probability</th>
+</tr>
+{% for r in records %}
+<tr>
+<td>{{ r[1] }}</td>
+<td>{{ r[10] }}</td>
+<td>{{ "%.2f"|format(r[11]) }}</td>
+</tr>
+{% endfor %}
+</table>
+<a href="/logout">Logout</a>
