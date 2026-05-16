@@ -14,7 +14,11 @@ from flask_login import (
     logout_user, current_user
 )
 from werkzeug.security import check_password_hash
-from .database import init_db
+
+try:
+    from .database import init_db
+except ImportError:
+    from database import init_db
 
 app = Flask(__name__)
 app.secret_key = "very-secret-key"
@@ -160,4 +164,5 @@ def admin():
 
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host="0.0.0.0", port=port, debug=False)
