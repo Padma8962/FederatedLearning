@@ -16,6 +16,8 @@ saved_models/
 *.keras
 *.h5
 *.pkl
+!saved_model.keras
+!scaler.pkl
 
 # Logs
 *.log

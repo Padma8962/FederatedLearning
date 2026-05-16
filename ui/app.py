@@ -18,7 +18,12 @@ from .database import init_db
 
 app = Flask(__name__)
 app.secret_key = "very-secret-key"
-init_db()
+
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+PROJECT_DIR = os.path.abspath(os.path.join(BASE_DIR, ".."))
+DB_PATH = os.path.join(PROJECT_DIR, "patients.db")
+
+init_db(DB_PATH)
 
 login_manager = LoginManager(app)
 login_manager.login_view = "login"
@@ -33,7 +38,7 @@ class User(UserMixin):
 
 @login_manager.user_loader
 def load_user(user_id):
-    conn = sqlite3.connect("patients.db")
+    conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
     cursor.execute("SELECT id, username, role FROM users WHERE id=?", (user_id,))
     row = cursor.fetchone()
@@ -43,18 +48,22 @@ def load_user(user_id):
     return None
 
 
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-MODEL_DIR = os.path.abspath(os.path.join(BASE_DIR, "..", "saved_models"))
+MODEL_DIR = os.path.join(PROJECT_DIR, "saved_models")
+os.makedirs(MODEL_DIR, exist_ok=True)
 
 model_files = [f for f in os.listdir(MODEL_DIR) if f.endswith(".keras")]
 model_file = sorted(model_files)[-1] if model_files else None
 
 if model_file:
     model = tf.keras.models.load_model(os.path.join(MODEL_DIR, model_file))
+elif os.path.exists(os.path.join(PROJECT_DIR, "saved_model.keras")):
+    model = tf.keras.models.load_model(os.path.join(PROJECT_DIR, "saved_model.keras"))
 else:
     model = None
 
-scaler_path = os.path.join(BASE_DIR, "..", "scaler.pkl")
+scaler_path = os.path.join(PROJECT_DIR, "scaler.pkl")
+if not os.path.exists(scaler_path):
+    raise FileNotFoundError(f"Required scaler file is missing: {scaler_path}")
 scaler = joblib.load(scaler_path)
 
 
@@ -75,7 +84,7 @@ def login():
         username = request.form["username"]
         password = request.form["password"]
 
-        conn = sqlite3.connect("patients.db")
+        conn = sqlite3.connect(DB_PATH)
         cursor = conn.cursor()
         cursor.execute(
             "SELECT id, username, password, role FROM users WHERE username=?",
@@ -123,7 +132,7 @@ def index():
             "Non-Diabetic"
         )
 
-        conn = sqlite3.connect("patients.db")
+        conn = sqlite3.connect(DB_PATH)
         cursor = conn.cursor()
         cursor.execute("""
         INSERT INTO patients (
@@ -142,7 +151,7 @@ def index():
 @login_required
 @role_required("admin")
 def admin():
-    conn = sqlite3.connect("patients.db")
+    conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
     cursor.execute("SELECT * FROM patients")
     records = cursor.fetchall()

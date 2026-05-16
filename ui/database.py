@@ -2,8 +2,8 @@ import sqlite3
 from werkzeug.security import generate_password_hash
 
 
-def init_db():
-    conn = sqlite3.connect("patients.db")
+def init_db(db_path="patients.db"):
+    conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
 
     cursor.execute("""
