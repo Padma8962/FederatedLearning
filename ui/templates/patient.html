@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Patient Dashboard | Federated Healthcare</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <header class="topbar">
+        <div>
+            <p class="eyebrow">Patient Portal</p>
+            <h1>My Health Dashboard</h1>
+        </div>
+        <nav>
+            <span>{{ current_user.full_name }}</span>
+            <a href="{{ url_for('logout') }}">Logout</a>
+        </nav>
+    </header>
+
+    <main class="dashboard-grid">
+        <section class="workspace">
+            <div class="section-heading">
+                <div>
+                    <p class="eyebrow">Latest Result</p>
+                    <h2>Your prediction summary</h2>
+                </div>
+            </div>
+            {% if latest %}
+                <div class="result-banner">
+                    <div>
+                        <p class="eyebrow">Current status</p>
+                        <h3>{{ latest.prediction }}</h3>
+                        <p>{{ latest.notes or "No doctor notes added yet." }}</p>
+                    </div>
+                    <strong>{{ "%.1f"|format(latest.probability * 100) }}%</strong>
+                </div>
+            {% else %}
+                <div class="empty-state">
+                    <h3>No prediction yet</h3>
+                    <p>Ask your doctor to run an assessment and assign it to your username.</p>
+                </div>
+            {% endif %}
+        </section>
+
+        <aside class="side-panel">
+            <p class="eyebrow">Health Guidance</p>
+            <h2>Next steps</h2>
+            <ul class="clean-list">
+                <li>Track glucose values regularly.</li>
+                <li>Discuss high-risk results with your doctor.</li>
+                <li>Keep activity, sleep, and food logs updated.</li>
+            </ul>
+        </aside>
+
+        <section class="workspace full-width">
+            <div class="section-heading">
+                <div>
+                    <p class="eyebrow">History</p>
+                    <h2>My assessments</h2>
+                </div>
+            </div>
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Doctor</th>
+                            <th>Prediction</th>
+                            <th>Probability</th>
+                            <th>Notes</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for record in records %}
+                            <tr>
+                                <td>{{ record.doctor }}</td>
+                                <td>{{ record.prediction }}</td>
+                                <td>{{ "%.1f"|format(record.probability * 100) }}%</td>
+                                <td>{{ record.notes or "No notes" }}</td>
+                            </tr>
+                        {% else %}
+                            <tr><td colspan="4">No assessments available.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+</body>
+</html>

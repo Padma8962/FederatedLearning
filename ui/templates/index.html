@@ -1,97 +1,121 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Federated Healthcare System</title>
-    <style>
-        body {
-            font-family: Arial;
-            background: #eef2f7;
-        }
-
-        .container {
-            width: 420px;
-            margin: 50px auto;
-            background: white;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0px 0px 10px rgba(0,0,0,0.1);
-        }
-
-        input, button {
-            width: 100%;
-            padding: 8px;
-            margin: 6px 0;
-        }
-
-        button {
-            background: #007bff;
-            color: white;
-            border: none;
-            cursor: pointer;
-        }
-
-        button:hover {
-            background: #0056b3;
-        }
-
-        h2 {
-            text-align: center;
-        }
-
-        .logout {
-            text-align: right;
-            margin-bottom: 10px;
-        }
-
-        .logout a {
-            text-decoration: none;
-            color: #dc3545;
-            font-weight: bold;
-        }
-
-        .result {
-            margin-top: 15px;
-            padding: 10px;
-            background: #f8f9fa;
-            border-radius: 5px;
-            text-align: center;
-        }
-    </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Doctor Dashboard | Federated Healthcare</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
 </head>
-
 <body>
-<div class="container">
+    <header class="topbar">
+        <div>
+            <p class="eyebrow">Doctor Portal</p>
+            <h1>Diabetes Prediction</h1>
+        </div>
+        <nav>
+            <span>{{ current_user.full_name }}</span>
+            <a href="{{ url_for('logout') }}">Logout</a>
+        </nav>
+    </header>
 
-    <div class="logout">
-        <a href="/logout">Logout</a>
-    </div>
+    <main class="dashboard-grid">
+        <section class="workspace">
+            <div class="section-heading">
+                <div>
+                    <p class="eyebrow">New Assessment</p>
+                    <h2>Patient risk check</h2>
+                </div>
+                {% if not model_available %}
+                    <span class="status-pill danger">Model unavailable</span>
+                {% endif %}
+            </div>
 
-    <h2>Diabetes Prediction</h2>
+            <form method="POST" class="prediction-form">
+                <label class="wide">
+                    Patient account
+                    <select name="patient_username">
+                        <option value="">Unassigned patient</option>
+                        {% for patient in patients %}
+                            <option value="{{ patient.username }}" {{ 'selected' if selected_patient == patient.username else '' }}>
+                                {{ patient.full_name or patient.username }} ({{ patient.username }})
+                            </option>
+                        {% endfor %}
+                    </select>
+                </label>
+                <label>Pregnancies<input name="pregnancies" type="number" step="0.01" required></label>
+                <label>Glucose<input name="glucose" type="number" step="0.01" required></label>
+                <label>Blood Pressure<input name="bloodpressure" type="number" step="0.01" required></label>
+                <label>Skin Thickness<input name="skinthickness" type="number" step="0.01" required></label>
+                <label>Insulin<input name="insulin" type="number" step="0.01" required></label>
+                <label>BMI<input name="bmi" type="number" step="0.01" required></label>
+                <label>Diabetes Pedigree<input name="dpf" type="number" step="0.001" required></label>
+                <label>Age<input name="age" type="number" step="1" required></label>
+                <label class="wide">Doctor notes<textarea name="notes" rows="3" placeholder="Optional care note for the patient"></textarea></label>
+                <button class="wide" type="submit">Run Prediction</button>
+            </form>
 
-    <form method="POST">
-        <input name="pregnancies" placeholder="Pregnancies" required>
-        <input name="glucose" placeholder="Glucose" required>
-        <input name="bloodpressure" placeholder="Blood Pressure" required>
-        <input name="skinthickness" placeholder="Skin Thickness" required>
-        <input name="insulin" placeholder="Insulin" required>
-        <input name="bmi" placeholder="BMI" required>
-        <input name="dpf" placeholder="Diabetes Pedigree Function" required>
-        <input name="age" placeholder="Age" required>
-        <button type="submit">Predict</button>
-    </form>
+            {% if prediction %}
+                <div class="result-banner">
+                    <div>
+                        <p class="eyebrow">Result</p>
+                        <h3>{{ prediction }}</h3>
+                    </div>
+                    {% if score is not none %}
+                        <strong>{{ "%.1f"|format(score * 100) }}%</strong>
+                    {% endif %}
+                </div>
+            {% endif %}
+        </section>
 
-    {% if prediction %}
-    <div class="result">
-        <h3>Result: {{ prediction }}</h3>
+        <aside class="side-panel">
+            <p class="eyebrow">Doctor Tools</p>
+            <h2>Today</h2>
+            <div class="metric-row">
+                <span>Recent checks</span>
+                <strong>{{ recent_records|length }}</strong>
+            </div>
+            <div class="metric-row">
+                <span>Registered patients</span>
+                <strong>{{ patients|length }}</strong>
+            </div>
+            <div class="tip-box">
+                <strong>Care reminder</strong>
+                <p>Use notes to share next steps with the patient after each prediction.</p>
+            </div>
+        </aside>
 
-        {% if score is not none %}
-        <p><strong>Prediction Probability:</strong>
-            {{ "%.2f"|format(score * 100) }}%
-        </p>
-        {% endif %}
-    </div>
-    {% endif %}
-
-</div>
+        <section class="workspace full-width">
+            <div class="section-heading">
+                <div>
+                    <p class="eyebrow">History</p>
+                    <h2>Recent assessments</h2>
+                </div>
+            </div>
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Patient</th>
+                            <th>Prediction</th>
+                            <th>Probability</th>
+                            <th>Notes</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for record in recent_records %}
+                            <tr>
+                                <td>{{ record.patient_username or "Unassigned" }}</td>
+                                <td>{{ record.prediction }}</td>
+                                <td>{{ "%.1f"|format(record.probability * 100) }}%</td>
+                                <td>{{ record.notes or "No notes" }}</td>
+                            </tr>
+                        {% else %}
+                            <tr><td colspan="4">No assessments yet.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </main>
 </body>
 </html>

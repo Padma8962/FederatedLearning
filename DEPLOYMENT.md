@@ -40,6 +40,7 @@ FLOWER_SERVER_ADDRESS=your-backend-host:8080
 Default demo accounts are created automatically when the web app starts:
 
 - Doctor: `doctor` / `doctor123`
+- Patient: `patient` / `patient123`
 - Admin: `admin` / `admin123`
 
 ## Notes

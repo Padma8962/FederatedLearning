@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up | Federated Healthcare</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body class="auth-page">
+    <main class="auth-shell signup-shell">
+        <section class="auth-panel">
+            <div class="brand-mark">FH</div>
+            <p class="eyebrow">Create Account</p>
+            <h1>Join the healthcare portal</h1>
+            <p class="muted">Patients can track their predictions. Doctors can run new checks and manage recent consultations.</p>
+        </section>
+
+        <section class="auth-card">
+            <p class="eyebrow">Signup</p>
+            <h2>Create your profile</h2>
+            <form method="post" class="form-stack">
+                <label>
+                    Full name
+                    <input name="full_name" autocomplete="name" required>
+                </label>
+                <label>
+                    Email
+                    <input name="email" type="email" autocomplete="email" required>
+                </label>
+                <label>
+                    Username
+                    <input name="username" autocomplete="username" required>
+                </label>
+                <label>
+                    Password
+                    <input name="password" type="password" autocomplete="new-password" minlength="6" required>
+                </label>
+                <label>
+                    Account type
+                    <select name="role">
+                        <option value="patient">Patient</option>
+                        <option value="doctor">Doctor</option>
+                    </select>
+                </label>
+                {% if error %}
+                    <p class="alert">{{ error }}</p>
+                {% endif %}
+                <button type="submit">Create Account</button>
+            </form>
+            <p class="form-note">Already registered? <a href="{{ url_for('login') }}">Login</a></p>
+        </section>
+    </main>
+</body>
+</html>

@@ -1,10 +1,70 @@
-<h2>Login</h2>
-<form method="post">
-    <input name="username" placeholder="Username" required><br><br>
-    <input name="password" type="password" placeholder="Password" required><br><br>
-    <button type="submit">Login</button>
-</form>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login | Federated Healthcare</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body class="auth-page">
+    <main class="auth-shell">
+        <section class="auth-panel">
+            <div class="brand-mark">FH</div>
+            <p class="eyebrow">Federated Healthcare</p>
+            <h1>Secure access for care teams and patients</h1>
+            <p class="muted">Choose your portal, sign in, and continue to your dashboard.</p>
 
-{% if error %}
-<p style="color:red;">{{ error }}</p>
-{% endif %}
+            <div class="role-cards">
+                <a class="role-card {{ 'active' if selected_role == 'doctor' else '' }}" href="{{ url_for('role_login', role='doctor') }}">
+                    <span>Doctor</span>
+                    <small>Run diabetes risk checks and review recent patients.</small>
+                </a>
+                <a class="role-card {{ 'active' if selected_role == 'patient' else '' }}" href="{{ url_for('role_login', role='patient') }}">
+                    <span>Patient</span>
+                    <small>View your results, notes, and health guidance.</small>
+                </a>
+            </div>
+        </section>
+
+        <section class="auth-card">
+            {% if selected_role %}
+                <p class="eyebrow">{{ selected_role|title }} Login</p>
+                <h2>Welcome back</h2>
+                <form method="post" class="form-stack">
+                    <label>
+                        Username
+                        <input name="username" autocomplete="username" required>
+                    </label>
+                    <label>
+                        Password
+                        <input name="password" type="password" autocomplete="current-password" required>
+                    </label>
+                    {% if error %}
+                        <p class="alert">{{ error }}</p>
+                    {% endif %}
+                    <button type="submit">Login</button>
+                </form>
+                <p class="form-note">New here? <a href="{{ url_for('signup') }}">Create an account</a></p>
+                <p class="form-note"><a href="{{ url_for('login') }}">Choose another portal</a></p>
+            {% else %}
+                <p class="eyebrow">Choose Portal</p>
+                <h2>Select login type</h2>
+                <form method="post" class="form-stack">
+                    <div class="segmented">
+                        <label>
+                            <input type="radio" name="role" value="doctor" checked>
+                            <span>Doctor</span>
+                        </label>
+                        <label>
+                            <input type="radio" name="role" value="patient">
+                            <span>Patient</span>
+                        </label>
+                    </div>
+                    <button type="submit">Continue</button>
+                </form>
+                <p class="form-note">Need access? <a href="{{ url_for('signup') }}">Sign up</a></p>
+            {% endif %}
+        </section>
+    </main>
+</body>
+</html>

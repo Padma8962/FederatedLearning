@@ -1,14 +1,59 @@
-<h2>Admin Dashboard</h2>
-<table border="1">
-<tr>
-<th>Doctor</th><th>Prediction</th><th>Probability</th>
-</tr>
-{% for r in records %}
-<tr>
-<td>{{ r[1] }}</td>
-<td>{{ r[10] }}</td>
-<td>{{ "%.2f"|format(r[11]) }}</td>
-</tr>
-{% endfor %}
-</table>
-<a href="/logout">Logout</a>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard | Federated Healthcare</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <header class="topbar">
+        <div>
+            <p class="eyebrow">Admin Portal</p>
+            <h1>Assessment Overview</h1>
+        </div>
+        <nav>
+            <span>{{ current_user.full_name }}</span>
+            <a href="{{ url_for('logout') }}">Logout</a>
+        </nav>
+    </header>
+
+    <main class="dashboard-grid single">
+        <section class="workspace full-width">
+            <div class="section-heading">
+                <div>
+                    <p class="eyebrow">System Records</p>
+                    <h2>All predictions</h2>
+                </div>
+                <span class="status-pill">{{ records|length }} records</span>
+            </div>
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Doctor</th>
+                            <th>Patient</th>
+                            <th>Prediction</th>
+                            <th>Probability</th>
+                            <th>Notes</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for record in records %}
+                            <tr>
+                                <td>{{ record.doctor }}</td>
+                                <td>{{ record.patient_username or "Unassigned" }}</td>
+                                <td>{{ record.prediction }}</td>
+                                <td>{{ "%.1f"|format(record.probability * 100) }}%</td>
+                                <td>{{ record.notes or "No notes" }}</td>
+                            </tr>
+                        {% else %}
+                            <tr><td colspan="5">No records yet.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+</body>
+</html>
