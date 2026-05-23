@@ -1,8 +1,13 @@
 import flwr as fl
-from client.model import create_model
 import os
+import sys
 
-SAVE_DIR = "saved_models"
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+
+from client.model import create_model
+
+PROJECT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+SAVE_DIR = os.path.join(PROJECT_DIR, "saved_models")
 SERVER_HOST = os.environ.get("SERVER_HOST", "0.0.0.0")
 SERVER_PORT = int(os.environ.get("SERVER_PORT", os.environ.get("PORT", 8080)))
 
