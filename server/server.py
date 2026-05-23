@@ -3,6 +3,8 @@ from client.model import create_model
 import os
 
 SAVE_DIR = "saved_models"
+SERVER_HOST = os.environ.get("SERVER_HOST", "0.0.0.0")
+SERVER_PORT = int(os.environ.get("SERVER_PORT", os.environ.get("PORT", 8080)))
 
 os.makedirs(SAVE_DIR, exist_ok=True)
 
@@ -39,7 +41,7 @@ if __name__ == "__main__":
     strategy = SaveModelStrategy()
 
     fl.server.start_server(
-        server_address="127.0.0.1:8080",
+        server_address=f"{SERVER_HOST}:{SERVER_PORT}",
         strategy=strategy,
         config=fl.server.ServerConfig(num_rounds=10),
     )
