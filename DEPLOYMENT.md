@@ -17,6 +17,13 @@ The federated backend must be deployed as a separate worker/service:
 python server/server.py
 ```
 
+On Render, use these start commands:
+
+- Website web service: `gunicorn ui.app:app`
+- Flower backend service: `python server/server.py`
+
+Do not use `python server/server.py` for the public Flask website service.
+
 ## Environment variables
 
 For the Flower server:

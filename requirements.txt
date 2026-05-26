@@ -4,7 +4,8 @@ gunicorn==23.0.0
 tensorflow==2.20.0
 numpy==2.3.5
 pandas==2.3.3
-scikit-learn==1.8.0
+# imbalanced-learn 0.14.0 imports sklearn internals removed in 1.8.x.
+scikit-learn==1.7.2
 imbalanced-learn==0.14.0
 joblib==1.5.3
 flwr==1.24.0
