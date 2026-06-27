@@ -195,7 +195,14 @@ def show_login():
                         new_password,
                         new_role,
                     )
-                    st.success("Account created. You can now sign in.")
+                    user = authenticate(new_username, new_password, new_role)
+                    if user is None:
+                        raise ValueError(
+                            "The account was created, but automatic sign-in failed."
+                        )
+                    st.session_state.user = user
+                    st.session_state.account_created = True
+                    st.rerun()
                 except ValueError as exc:
                     st.error(str(exc))
 
@@ -392,6 +399,9 @@ def main():
     if not user:
         show_login()
         return
+
+    if st.session_state.pop("account_created", False):
+        st.success("Your account was created successfully.")
 
     with st.sidebar:
         st.subheader(user["full_name"])
