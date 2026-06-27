@@ -137,9 +137,15 @@ def show_login():
     st.title("🩺 Federated Health")
     st.caption("Secure diabetes-risk screening and patient follow-up")
 
-    login_tab, signup_tab = st.tabs(["Sign in", "Create account"])
+    access_mode = st.segmented_control(
+        "Account access",
+        ["Sign in", "Create account"],
+        default="Sign in",
+        key="access_mode",
+        label_visibility="collapsed",
+    )
 
-    with login_tab:
+    if access_mode == "Sign in":
         with st.form("login_form"):
             role = st.segmented_control(
                 "Account type",
@@ -165,8 +171,8 @@ def show_login():
                 "Admin: admin / admin123"
             )
 
-    with signup_tab:
-        with st.form("signup_form", clear_on_submit=True):
+    else:
+        with st.form("signup_form"):
             full_name = st.text_input("Full name")
             email = st.text_input("Email")
             new_username = st.text_input("Choose a username")
@@ -205,6 +211,8 @@ def show_login():
                     st.rerun()
                 except ValueError as exc:
                     st.error(str(exc))
+                except sqlite3.Error as exc:
+                    st.error(f"The account database could not be updated: {exc}")
 
 
 def records_table(records, include_patient=False, include_doctor=False):
